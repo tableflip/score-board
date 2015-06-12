@@ -7,6 +7,10 @@ or
 ```
 npm install git://github.com/tableflip/score-board.git
 ```
+Don't forget to
+```
+npm install
+```
 This module wraps some handy function calls around localforage. The idea is you have a generic score board to which you add teams. Then you can update scores more succinctly like this.
 ```js
 var scoreBoard = require('score-board')
@@ -29,3 +33,4 @@ scoreBoard.sharks.get(cb) returns 9 as the second argument of a callback
 scoreBoard.sharks.deduct(3, cb) returns 6 as the second argument of a callback
 ```
 Uses tape in the browser for tests. To run the tests type `npm test` in the root of the project.
+![tape tests](https://pbs.twimg.com/media/CHQwKgGWcAEAB0S.jpg)

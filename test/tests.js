@@ -2,14 +2,32 @@ var test = require('tape')
 var async = require('async')
 var scoreBoard = require('../src/score-board')
 
+test('you can init the board with teams', function (t) {
+  t.plan(3)
+  async.waterfall([
+    function initScoreBoard (cb) {
+      scoreBoard.addTeams(['test','team'], cb)
+    },
+    function (result, cb) {
+      t.ok(scoreBoard.test, 'adds the new test team to the scoreBoard')
+      t.ok(scoreBoard.team, 'adds the other new team to the scoreBoard')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no error on init')
+    t.end()
+  })
+})
 test('The scoreBoard holds two scores', function (t) {
   t.plan(3)
 
   async.waterfall([
     function resetScoreBoard (cb) {
-      scoreBoard.reset(cb)  
+      scoreBoard.reset(function () {
+        scoreBoard.addTeams(['team1','team2'], cb)
+      })  
     },
-    function getTeam1Score (cb) {
+    function getTeam1Score (teams, cb) {
       scoreBoard.team1.get(function (err, result) {
         t.equal(result, 0, 'the score for team1 starts at 0')
         cb()
@@ -46,9 +64,11 @@ test('Should be able to deduct from the score', function (t) {
   t.plan(3)
   async.waterfall([
     function resetScoreBoard (cb) {
-      scoreBoard.reset(cb)
+      scoreBoard.reset(function () {
+        scoreBoard.addTeams(['team1', 'team2'], cb)
+      })
     },
-    function addScore (cb) {
+    function addScore (teams, cb) {
       scoreBoard.team1.add(100, cb)
     },
     function assertValue (result, cb) {
@@ -68,9 +88,11 @@ test('Should be able to create a negative score', function (t) {
   t.plan(3)
   async.waterfall([
     function resetScoreBoard (cb) {
-      scoreBoard.reset(cb)
+      scoreBoard.reset(function () {
+        scoreBoard.addTeams(['team1', 'team2'], cb)
+      })
     },
-    function addScore (cb) {
+    function addScore (teams, cb) {
       scoreBoard.team1.add(10, cb)
     },
     function assertValue (result, cb) {
