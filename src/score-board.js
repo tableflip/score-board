@@ -7,7 +7,7 @@ module.exports = function (localforage) {
       this.keys = array
       for(i in array){
         this[array[i]] = createInterface(array[i])
-        if (parseInt(i)+1 === array.length) this.reset(cb)
+        if (parseInt(i)+1 === array.length) cb(null, array)
       }
       return array
     },
