@@ -2,30 +2,32 @@ var localforage = require('localforage')
 
 module.exports = function (localforage) {
   //init
-  localforage.getItem('team1', function (err, result) {
-    if (err) throw new Error(err)
-    if (!result || result > 0) {
-      ['team1', 'team2'].forEach(function (key) {
-        localforage.setItem(key, 0)
-      })
-    }
-  })
+  
   //return interface
   return {
-    team1: createInterface('team1'),
-    team2: createInterface('team2'),
+    addTeams: function (array, cb) {
+      this.keys = array
+      for(i in array){
+        this[array[i]] = createInterface(array[i])
+        if (parseInt(i)+1 === array.length) this.reset(cb)
+      }
+    },
     reset: function (cb) {
-      resetToZero(['team1', 'team2'], cb)
-    }
+      resetToZero(this.keys, cb)
+    },
+    keys: []
   }
 }(localforage)
 
 function resetToZero (keys, cb) {
   if (!Array.isArray(keys)) throw new Error('Must be an array')
-  keys.forEach(function (key) {
-    localforage.setItem(key, 0)
-  })
-  cb() 
+  keys.forEach(function (key, index) {
+    if (index+1 === keys.length) {
+      localforage.setItem(key, 0, cb)
+    }else{
+      localforage.setItem(key, 0)
+    }
+  }) 
 }
 
 function createInterface (key) {
