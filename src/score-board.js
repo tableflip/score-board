@@ -3,32 +3,30 @@ var localforage = require('localforage')
 module.exports = function (localforage) {
   //return interface
   return {
-    addTeams: function (array, cb) {
-      this.keys = array
-      for(i in array){
-        this[array[i]] = createInterface(array[i])
-        if (parseInt(i)+1 === array.length) cb(null, array)
+    addTeams: function (teams, cb) {
+      this.keys = teams
+      for(i in teams){
+        this[teams[i]] = createInterface(teams[i])
+        localforage.setItem(teams[i], 0)
+        if (parseInt(i)+1 === teams.length) cb(null, teams)
       }
-      return array
     },
     reset: function (cb) {
-      resetToZero(this.keys, cb)
+      resetToZero(this.teams, cb)
     },
-    keys: []
+    teams: []
   }
 }(localforage)
 
 function resetToZero (keys, cb) {
-  if (!Array.isArray(keys)) throw new Error('Must be an array')
   keys.forEach(function (key, index) {
     if (index+1 === keys.length) {
       localforage.setItem(key, 0)
-      localforage.setItem(key+'players', null, cb)
     }else{
       localforage.setItem(key, 0)
-      localforage.setItem(key+'players', null)
     }
-  }) 
+  })
+  cb(null, keys)
 }
 
 function createInterface (key) {
@@ -49,27 +47,16 @@ function createInterface (key) {
         localforage.setItem(key, parseInt(result)-parseInt(value), cb)
       })
     },
-    addplayer: function (player, cb) {
-      localforage.getItem(key+'players', function (err, players) {
-        if (err) throw new Error(err)
-        var update = concatPlayers(players, player)
-        localforage.setItem(key+'players', update, function (err, result) {
-          cb(null, result.split(','))
-        })
-      })
+    addplayer1: function (player, cb) {
+      localforage.setItem(key+'player1', player, cb)
+    },
+    addplayer2: function (player, cb) {
+      localforage.setItem(key+'player2', player, cb)
     },
     players: function (cb) {
-      localforage.getItem(key+'players', function (err, result) {
+      localforage.getItem(key+'players1', function (err, result) {
         cb(null, result.split(','))
       })
     }
   }
-}
-function concatPlayers (players, player) {
-  if (players === null) {
-    var update = player
-  }else{
-    var update = players + ',' + player
-  }
-  return update
 }
