@@ -37,12 +37,12 @@ function createInterface (key) {
     },
     add: function (value, cb) {
       localforage.getItem(key, function (err, result) {
-        localforage.setItem(key, value+result, cb)
+        localforage.setItem(key, parseInt(value)+parseInt(result), cb)
       })
     },
     deduct: function (value, cb) {
       localforage.getItem(key, function (err, result) {
-        localforage.setItem(key, result-value, cb)
+        localforage.setItem(key, parseInt(result)-parseInt(value), cb)
       })
     }
   }

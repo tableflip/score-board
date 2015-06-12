@@ -60,6 +60,29 @@ test('Should be able to increment the score', function (t) {
     t.end()
   })
 })
+test('Should be able to coerce strings to ints', function (t) {
+  t.plan(2)
+  async.waterfall([
+    function resetScoreBoard (cb) {
+      scoreBoard.reset(function () {
+        scoreBoard.addTeams(['team1', 'team2'], cb)
+      })
+    },
+    function addScore (teams, cb) {
+      scoreBoard.team1.add(100, cb)
+    },
+    function addString (result, cb) {
+      scoreBoard.team1.add("100", cb)
+    },
+    function assertValue (result, cb) {
+      t.equal(result, 200, 'can pass as a string')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no errors when passing numbers as strings')
+    t.end()
+  })
+})
 test('Should be able to deduct from the score', function (t) {
   t.plan(3)
   async.waterfall([
