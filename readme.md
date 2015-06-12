@@ -28,9 +28,10 @@ function (err, result) {
 ```
 Here is v0.0.1 interface
 ```js
+scoreBoard.addTeams(['sharks']) // set up a team
 scoreBoard.sharks.add(9, cb) // returns 9 as the second argument of a callback 
-scoreBoard.sharks.get(cb) returns 9 as the second argument of a callback
-scoreBoard.sharks.deduct(3, cb) returns 6 as the second argument of a callback
+scoreBoard.sharks.get(cb) // returns 9 as the second argument of a callback
+scoreBoard.sharks.deduct(3, cb) // returns 6 as the second argument of a callback
 ```
 Uses tape in the browser for tests. To run the tests type `npm test` in the root of the project.
 ![tape tests](https://pbs.twimg.com/media/CHQwKgGWcAEAB0S.jpg)
