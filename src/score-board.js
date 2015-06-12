@@ -9,6 +9,7 @@ module.exports = function (localforage) {
         this[array[i]] = createInterface(array[i])
         if (parseInt(i)+1 === array.length) this.reset(cb)
       }
+      return array
     },
     reset: function (cb) {
       resetToZero(this.keys, cb)
