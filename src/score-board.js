@@ -33,6 +33,13 @@ function Interface (team) {
         var newScore = parseInt(total) - parseInt(score)
         localforage.setItem(team+'score', newScore, cb)
       })      
+    },
+    players: {},
+    addPlayer: function (key, value, cb) {
+      this.players[key] = function (cb) {
+        localforage.getItem(team+key+value, cb)
+      }
+      localforage.setItem(team+key+value, value, cb)
     }
   }
 }

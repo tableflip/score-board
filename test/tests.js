@@ -115,72 +115,43 @@ test('The score increments', function (t) {
     t.end()
   })
 })
-// test('Should be able to add a player1', function (t) {
-//   t.plan(2)
-//   async.waterfall([
-//     function resetScoreBoard (cb) {
-//       scoreBoard.reset(function () {
-//         scoreBoard.addTeams(['team1', 'team2'], cb)
-//       })
-//     },
-//     function addPlayer (teams, cb) {
-//       scoreBoard.team1.addplayer1('player',cb)
-//     },
-//     function assertPlayer (player, cb) {
-//       t.same(player, 'player', 'adds a player')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors adding player1')
-//     t.end()
-//   })
-// })
-// test('Should be able to add a player2', function (t) {
-//   t.plan(2)
-//   async.waterfall([
-//     function resetScoreBoard (cb) {
-//       scoreBoard.reset(function () {
-//         scoreBoard.addTeams(['team1', 'team2'], cb)
-//       })
-//     },
-//     function addPlayer (teams, cb) {
-//       scoreBoard.team1.addplayer2('player',cb)
-//     },
-//     function assertPlayer (player, cb) {
-//       t.same(player, 'player', 'adds a player')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors adding player2')
-//     t.end()
-//   })
-// })
-// test('Should be able to get players', function (t) {
-//   t.plan(3)
-//   async.waterfall([
-//     function resetScoreBoard (cb) {
-//       scoreBoard.reset(function () {
-//         scoreBoard.addTeams(['team1', 'team2'], cb)
-//       })
-//     },
-//     function addPlayer1 (teams, cb) {
-//       scoreBoard.team1.addplayer1('player1',cb)
-//     },
-//     function addPlayer2 (player, cb) {
-//       scoreBoard.team1.addplayer2('player2',cb)
-//     },
-//     function getPlayers (players, cb) {
-//       scoreBoard.team1.players(cb)
-//     },
-//     function assertOnPlayers (players, cb) {
-//       t.equals(players.length, 2, 'returns an array of players')
-//       t.equals(players[1], 'player2', 'players names are in the array')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors getting players')
-//     t.end()
-//   })
-// })
-
+test('You can add players', function (t) {
+  t.plan(2)
+  async.waterfall([
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
+    },
+    function addPlayer (teams, cb) {
+      scoreBoard.test.addPlayer('player1', 'testname', cb)
+    },
+    function getPlayers (player, cb) {
+      t.ok(player, 'returns the player')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no errors')
+    t.end()
+  })
+})
+test('You can retrieve players', function (t) {
+  t.plan(2)
+  async.waterfall([
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
+    },
+    function addPlayer (teams, cb) {
+      scoreBoard.test.addPlayer('player1', 'testname', cb)
+    },
+    function getPlayer (player, cb) {
+      scoreBoard.test.players.player1(cb)
+    },
+    function assert (player, cb) {
+      t.equals(player, 'testname', 'Stores testname under player1')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no errors')
+    t.end()
+  })
+})
 
