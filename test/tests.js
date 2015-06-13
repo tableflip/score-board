@@ -1,132 +1,88 @@
 var test = require('tape')
 var async = require('async')
-var scoreBoard = require('../src/score-board')
+var ScoreBoard = require('../src/score-board')
 
-test('you can init the board with teams', function (t) {
-  t.plan(3)
+test('A new team starts with a score of 0', function (t) {
+  t.plan(2)
+  var scoreBoard
   async.waterfall([
     function initScoreBoard (cb) {
-      scoreBoard.addTeams(['test','team'], cb)
+      scoreBoard = new ScoreBoard(['test'], cb)
     },
-    function (result, cb) {
-      t.ok(scoreBoard.test, 'adds the new test team to the scoreBoard')
-      t.ok(scoreBoard.team, 'adds the other new team to the scoreBoard')
+    function getScore (teams, cb) {
+      scoreBoard.test.getScore(cb)
+    },
+    function assertOnScore (score, cb) {
+      t.equals(score, 0, 'score is 0')
       cb()
     }
   ], function (err) {
-    t.ifError(err, 'no error on init')
+    t.ifError(err, 'no error')
+    t.end()
+  })
+})
+test('You can add a score to the scoreBoard', function (t) {
+  t.plan(2)
+  var scoreBoard
+  async.waterfall([
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
+    },
+    function addScore (teams, cb) {
+      scoreBoard.test.addScore(10, cb)
+    },
+    function assertOnScore (score, cb) {
+      t.equals(score, 10, 'like a 10 letter word score')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no errors')
     t.end()
   })
 })
 test('The scoreBoard holds two scores', function (t) {
-  t.plan(3)
+  t.plan(4)
 
   async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function (err, result) {
-        scoreBoard.addTeams(['team1','team2'], cb)
-      })  
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['team1','team2'], cb)
     },
-    function getTeam1Score (teams, cb) {
-      scoreBoard.team1.get(function (err, result) {
-        t.equal(result, 0, 'the score for team1 starts at 0')
-        cb()
-      })
+    function addScore (teams, cb) {
+      t.equal(teams.length, 2, 'returns team names on init')
+      scoreBoard.team1.addScore(1)
+      scoreBoard.team2.addScore(2, cb)
     },
-    function getTeam2Score (cb) {
-      scoreBoard.team2.get(function (err, result) {
-        t.equal(result, 0, 'and same for team2')
-        cb()
-      })     
+    function getScores (team2score, cb) {
+      scoreBoard.team1.getScore(cb)
+    },
+    function assertTeam1Score (score, cb) {
+      t.equal(score, 1, 'team 1 has a score of 1')
+      scoreBoard.team2.getScore(cb)
+    },
+    function assertTeam2Score (score, cb) {
+      t.equal(score, 2, 'team 2 has a score of 2')
+      cb()
     }
   ], function (err) {
     t.ifError(err, 'no errors on getting scores')
     t.end()
   })
 })
-test('Should be able to add to the score', function (t) {
-  t.plan(2)
-  async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function (err, result) {
-        scoreBoard.addTeams(['team1','team2'], cb)
-      })  
-    },
-    function addTurn (teams, cb) {
-      scoreBoard.team1.add(10, cb)   
-    },
-    function makeAssertions (result, cb) {
-      t.equal(result, 10, 'adds value ok')
-      cb()
-    }
-  ], function (err) {
-    t.ifError(err, 'no errors adding to score')
-    t.end()
-  })
-})
-test('Should be able to increment the score', function (t) {
-  t.plan(2)
-  async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function (err, reset) {
-        scoreBoard.addTeams(['team1','team2'], cb)
-      })  
-    },
-    function addTurn (teams, cb) {
-      scoreBoard.team1.add(1, cb)   
-    },
-    function addAnother (score, cb) {
-      scoreBoard.team1.add(1, cb)
-    },
-    function makeAssertions (score, cb) {
-      t.equal(score, 2, 'increments score ok')
-      cb()
-    }
-  ], function (err) {
-    t.ifError(err, 'no errors adding to score')
-    t.end()
-  })
-})
-test('Should be able to coerce strings to ints', function (t) {
-  t.plan(2)
-  async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function () {
-        scoreBoard.addTeams(['team1', 'team2'], cb)
-      })
-    },
-    function addScore (teams, cb) {
-      scoreBoard.team1.add(100, cb)
-    },
-    function addString (result, cb) {
-      scoreBoard.team1.add("100", cb)
-    },
-    function assertValue (result, cb) {
-      t.equal(result, 200, 'can pass as a string')
-      cb()
-    }
-  ], function (err) {
-    t.ifError(err, 'no errors when passing numbers as strings')
-    t.end()
-  })
-})
 test('Should be able to deduct from the score', function (t) {
   t.plan(3)
   async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function () {
-        scoreBoard.addTeams(['team1', 'team2'], cb)
-      })
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
     },
     function addScore (teams, cb) {
-      scoreBoard.team1.add(100, cb)
+      scoreBoard.test.addScore(2, cb)
     },
-    function assertValue (result, cb) {
-      t.equal(result, 100, 'score at 100')
-      scoreBoard.team1.deduct(99, cb)
+    function assertValue (score, cb) {
+      t.equal(score, 2, 'score set at 2')
+      scoreBoard.test.deduct(1, cb)
     },
-    function assertNewValue (result, cb) {
-      t.equal(result, 1, 'deduct 99 score now 1')
+    function assertNewValue (newScore, cb) {
+      t.equal(newScore, 1, 'deduct 1 score now 1')
       cb()
     }
   ], function (err) {
@@ -134,70 +90,71 @@ test('Should be able to deduct from the score', function (t) {
     t.end()
   })
 })
-test('Should be able to create a negative score', function (t) {
+test('The score increments', function (t) {
   t.plan(3)
   async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function () {
-        scoreBoard.addTeams(['team1', 'team2'], cb)
-      })
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
     },
     function addScore (teams, cb) {
-      scoreBoard.team1.add(10, cb)
+      scoreBoard.test.addScore(1, cb)
     },
-    function assertValue (result, cb) {
-      t.equal(result, 10, 'score at 10')
-      scoreBoard.team1.deduct(20, cb)
+    function addAgain (score, cb) {
+      t.equals(score, 1, 'score at 1')
+      scoreBoard.test.addScore(1, cb)
     },
-    function assertNewValue (result, cb) {
-      t.equal(result, -10, 'deduct 20 score now -10')
+    function getScore (score, cb) {
+      scoreBoard.test.getScore(cb)
+    },
+    function assertValue (score, cb) {
+      t.equal(score, 2, 'score now 2')
       cb()
-    }
+    },
   ], function (err) {
-    t.ifError(err, 'no errors deducting')
+    t.ifError(err, 'no errors')
     t.end()
   })
 })
-test('Should be able to add a player1', function (t) {
-  t.plan(2)
-  async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function () {
-        scoreBoard.addTeams(['team1', 'team2'], cb)
-      })
-    },
-    function addPlayer (teams, cb) {
-      scoreBoard.team1.addplayer1('player',cb)
-    },
-    function assertPlayer (player, cb) {
-      t.same(player, 'player', 'adds a player')
-      cb()
-    }
-  ], function (err) {
-    t.ifError(err, 'no errors adding player1')
-    t.end()
-  })
-})
-test('Should be able to add a player2', function (t) {
-  t.plan(2)
-  async.waterfall([
-    function resetScoreBoard (cb) {
-      scoreBoard.reset(function () {
-        scoreBoard.addTeams(['team1', 'team2'], cb)
-      })
-    },
-    function addPlayer (teams, cb) {
-      scoreBoard.team1.addplayer2('player',cb)
-    },
-    function assertPlayer (player, cb) {
-      t.same(player, 'player', 'adds a player')
-      cb()
-    }
-  ], function (err) {
-    t.ifError(err, 'no errors adding player2')
-    t.end()
-  })
-})
+// test('Should be able to add a player1', function (t) {
+//   t.plan(2)
+//   async.waterfall([
+//     function resetScoreBoard (cb) {
+//       scoreBoard.reset(function () {
+//         scoreBoard.addTeams(['team1', 'team2'], cb)
+//       })
+//     },
+//     function addPlayer (teams, cb) {
+//       scoreBoard.team1.addplayer1('player',cb)
+//     },
+//     function assertPlayer (player, cb) {
+//       t.same(player, 'player', 'adds a player')
+//       cb()
+//     }
+//   ], function (err) {
+//     t.ifError(err, 'no errors adding player1')
+//     t.end()
+//   })
+// })
+// test('Should be able to add a player2', function (t) {
+//   t.plan(2)
+//   async.waterfall([
+//     function resetScoreBoard (cb) {
+//       scoreBoard.reset(function () {
+//         scoreBoard.addTeams(['team1', 'team2'], cb)
+//       })
+//     },
+//     function addPlayer (teams, cb) {
+//       scoreBoard.team1.addplayer2('player',cb)
+//     },
+//     function assertPlayer (player, cb) {
+//       t.same(player, 'player', 'adds a player')
+//       cb()
+//     }
+//   ], function (err) {
+//     t.ifError(err, 'no errors adding player2')
+//     t.end()
+//   })
+// })
 // test('Should be able to get players', function (t) {
 //   t.plan(3)
 //   async.waterfall([
