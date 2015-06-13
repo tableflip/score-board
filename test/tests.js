@@ -115,7 +115,7 @@ test('The score increments', function (t) {
     t.end()
   })
 })
-test('You can add players', function (t) {
+test('You can add a player', function (t) {
   t.plan(2)
   async.waterfall([
     function initScoreBoard (cb) {
@@ -154,4 +154,26 @@ test('You can retrieve players', function (t) {
     t.end()
   })
 })
-
+test('You can add many players', function (t) {
+  t.plan(3)
+  async.waterfall([
+    function initScoreBoard (cb) {
+      scoreBoard = new ScoreBoard(['test'], cb)
+    },
+    function addPlayer (teams, cb) {
+      scoreBoard.test.addPlayer('player1', 'testname1', cb)
+    },
+    function addAnother (player, cb) {
+      scoreBoard.test.addPlayer('player2', 'testname2', cb)
+    },
+    function getPlayers (player, cb) {
+      var players = Object.keys(scoreBoard.test.players)
+      t.equals(players.length, 2, 'two endpoints are created')
+      t.equals(typeof scoreBoard.test.players.player1, 'function', 'the endpoints are functions')
+      cb()
+    }
+  ], function (err) {
+    t.ifError(err, 'no errors')
+    t.end()
+  })
+})
