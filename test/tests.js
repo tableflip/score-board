@@ -42,7 +42,6 @@ test('You can add a score to the scoreBoard', function (t) {
 })
 test('The scoreBoard holds two scores', function (t) {
   t.plan(4)
-
   async.waterfall([
     function initScoreBoard (cb) {
       scoreBoard = new ScoreBoard(['team1','team2'], cb)
