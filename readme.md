@@ -11,7 +11,7 @@ Don't forget to
 ```
 npm install
 ```
-This module wraps some handy function calls around localforage. The idea is you have a generic score board to which you add teams. Then you can update scores more succinctly like this.
+This module is a generic score board for your browser. Initiate with team names in an array.
 ```js
 var ScoreBoard = require('score-board')
 var scoreBoard = new ScoreBoard(['sharks', 'jets'])
