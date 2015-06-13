@@ -1,17 +1,21 @@
 var localforage = require('localforage')
 var ScoreBoard = function (teams, cb) {
-  this.teams = teams
+  this.teams = teams.slice()
   init.call(this, teams, cb)
 }
 module.exports = ScoreBoard
 
 function init (teams, cb) {
   var self = this
-  teams.forEach(function (team) {
-    self[team] = new Interface(team)
-    localforage.setItem(team+'score', 0)
+  if (teams.length == 0) {
+    return cb.call(self, null, this.teams)
+  }
+  var team = teams.pop()
+  self[team] = new Interface(team)
+  localforage.setItem(team+'score', 0, function (err, done) {
+    if (err) throw new Error(err)
+    init.call(self, teams, cb)
   })
-  cb(null, teams)
 }
 
 function Interface (team) {
