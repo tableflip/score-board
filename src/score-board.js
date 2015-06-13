@@ -1,62 +1,45 @@
 var localforage = require('localforage')
+var ScoreBoard = function (teams, cb) {
+  this.teams = teams
+  init.call(this, teams, cb)
+}
+module.exports = ScoreBoard
 
-module.exports = function (localforage) {
-  //return interface
-  return {
-    addTeams: function (teams, cb) {
-      this.keys = teams
-      for(i in teams){
-        this[teams[i]] = createInterface(teams[i])
-        localforage.setItem(teams[i], 0)
-        if (parseInt(i)+1 === teams.length) cb(null, teams)
-      }
-    },
-    reset: function (cb) {
-      resetToZero(this.teams, cb)
-    },
-    teams: []
-  }
-}(localforage)
-
-function resetToZero (keys, cb) {
-  keys.forEach(function (key, index) {
-    if (index+1 === keys.length) {
-      localforage.setItem(key, 0)
-    }else{
-      localforage.setItem(key, 0)
-    }
+function init (teams, cb) {
+  var self = this
+  teams.forEach(function (team) {
+    self[team] = new Interface(team)
+    localforage.setItem(team+'score', 0)
   })
-  cb(null, keys)
+  cb(null, teams)
 }
 
-function createInterface (key) {
+function Interface (team) {
   return {
-    name: key,
-    get: function (cb) {
-      localforage.getItem(key, cb)
+    getScore: function (cb) {
+      localforage.getItem(team+'score', cb)
     },
-    add: function (value, cb) {
-      localforage.getItem(key, function (err, result) {
-        if (err) throw new Error(err)
-        localforage.setItem(key, parseInt(value)+parseInt(result), cb)
+    addScore: function (score, cb) {
+      localforage.getItem(team+'score', function (err, total) {
+        if (err) throw new Error('Boo can\'t recover score')
+        if (!total) return localforage.setItem(team+'score', score, cb)
+        var newScore = parseInt(total) + parseInt(score)
+        localforage.setItem(team+'score', newScore, cb)
       })
     },
-    deduct: function (value, cb) {
-      localforage.getItem(key, function (err, result) {
-        if (err) throw new Error(err)
-        localforage.setItem(key, parseInt(result)-parseInt(value), cb)
-      })
+    deduct: function (score, cb) {
+      localforage.getItem(team+'score', function (err, total) {
+        if (err) throw new Error('Boo can\'t recover score')
+        var newScore = parseInt(total) - parseInt(score)
+        localforage.setItem(team+'score', newScore, cb)
+      })      
     },
-    addplayer1: function (player, cb) {
-      localforage.setItem(key+'player1', player, cb)
-    },
-    addplayer2: function (player, cb) {
-      localforage.setItem(key+'player2', player, cb)
-    },
-    players: function (cb) {
-      localforage.getItem(key+'players1', function (err, result) {
-        cb(null, result.split(','))
-      })
+    players: {},
+    addPlayer: function (key, value, cb) {
+      this.players[key] = function (cb) {
+        localforage.getItem(team+key+value, cb)
+      }
+      localforage.setItem(team+key+value, value, cb)
     }
   }
 }
