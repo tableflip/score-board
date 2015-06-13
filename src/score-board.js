@@ -11,7 +11,7 @@ function init (teams, cb) {
     self[team] = new Interface(team)
     localforage.setItem(team+'score', 0)
   })
-  cb(null, teams)
+  cb(null, teams).bind(self)
 }
 
 function Interface (team) {
