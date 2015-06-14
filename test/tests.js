@@ -180,7 +180,7 @@ test('The score persists across a refresh', function (t) {
     })
   })
 })
-test('You can add a player', function (t) {
+test('You can add and get a player', function (t) {
   t.plan(3)
   localforage.clear(function (err, done) {
     async.waterfall([

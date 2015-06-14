@@ -1,5 +1,5 @@
 var localforage = require('localforage')
-var async = require('async')
+var _ = underscore
 
 var ScoreBoard = function (initTeams, cb) {
   var self = this
@@ -53,8 +53,8 @@ Interface.prototype.deduct = function (score, cb) {
 }
 Interface.prototype.addPlayer = function (key, value, cb) {
   var teamKey = this.team()
-  this[teamKey+key] = function (callback) {
-    return localforage.getItem(teamKey+key, callback)
+  this[key] = function (cb) {
+    localforage.getItem(teamKey+key, cb)
   }
   localforage.setItem(teamKey+key, value, cb)
 }
