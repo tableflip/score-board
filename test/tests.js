@@ -204,47 +204,11 @@ test('You can add and get a player', function (t) {
     })
   })
 })
-// test('You can retrieve players', function (t) {
-//   t.plan(2)
-//   async.waterfall([
-//     function initScoreBoard (cb) {
-//       scoreBoard = new ScoreBoard(['test'], cb)
-//     },
-//     function addPlayer (teams, cb) {
-//       scoreBoard.test.addPlayer('player1', 'testname', cb)
-//     },
-//     function getPlayer (player, cb) {
-//       scoreBoard.test.players.player1(cb)
-//     },
-//     function assert (player, cb) {
-//       t.equals(player, 'testname', 'Stores testname under player1')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors')
-//     t.end()
-//   })
-// })
-// test('You can add many players', function (t) {
-//   t.plan(3)
-//   async.waterfall([
-//     function initScoreBoard (cb) {
-//       scoreBoard = new ScoreBoard(['test'], cb)
-//     },
-//     function addPlayer (teams, cb) {
-//       scoreBoard.test.addPlayer('player1', 'testname1', cb)
-//     },
-//     function addAnother (player, cb) {
-//       scoreBoard.test.addPlayer('player2', 'testname2', cb)
-//     },
-//     function getPlayers (player, cb) {
-//       var players = Object.keys(scoreBoard.test.players)
-//       t.equals(players.length, 2, 'two endpoints are created')
-//       t.equals(typeof scoreBoard.test.players.player1, 'function', 'the endpoints are functions')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors')
-//     t.end()
-//   })
-// })
+test('Team names must be unique', function (t) {
+  t.plan(1)
+  t.throws(function () {
+    var scoreBoard = new ScoreBoard(['test', 'test'], cb)
+  })
+  t.end()
+})
+

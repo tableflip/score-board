@@ -1,7 +1,8 @@
 var localforage = require('localforage')
-var _ = underscore
+var _ = require('underscore')
 
 var ScoreBoard = function (initTeams, cb) {
+  if(_.uniq(initTeams).length !== initTeams.length) throw new Error('team names must be unique')
   var self = this
   self.reset = function (cb) {localforage.reset(cb)}
   self.teams = initTeams.slice()
