@@ -1,50 +1,53 @@
 var localforage = require('localforage')
-var ScoreBoard = function (teams, cb) {
-  this._teams = teams
-  this.teams = this._teams.slice()
-  init.call(this, teams, cb)
+var async = require('async')
+
+var ScoreBoard = function (initTeams, cb) {
+  var self = this
+  self.reset = function (cb) {localforage.reset(cb)}
+  self.teams = initTeams.slice()
+  init.call(self, initTeams, cb)
 }
+
 module.exports = ScoreBoard
 
 function init (teams, cb) {
   var self = this
   if (teams.length === 0) {
-    return cb.call(self, null, self.teams)
+    return cb(null, self)
   }
   var team = teams.pop()
   self[team] = new Interface(team)
-  localforage.setItem(team+'score', 0, function (err, done) {
-    if (err) throw new Error(err)
-    init.call(self, teams, cb)
-  })
+  init.call(self, teams, cb)
 }
 
 function Interface (team) {
-  return {
-    getScore: function (cb) {
-      localforage.getItem(team+'score', cb)
-    },
-    addScore: function (score, cb) {
-      localforage.getItem(team+'score', function (err, total) {
-        if (err) throw new Error('Boo can\'t recover score')
-        if (!total) return localforage.setItem(team+'score', score, cb)
-        var newScore = parseInt(total) + parseInt(score)
-        localforage.setItem(team+'score', newScore, cb)
-      })
-    },
-    deduct: function (score, cb) {
-      localforage.getItem(team+'score', function (err, total) {
-        if (err) throw new Error('Boo can\'t recover score')
-        var newScore = parseInt(total) - parseInt(score)
-        localforage.setItem(team+'score', newScore, cb)
-      })      
-    },
-    players: {},
-    addPlayer: function (key, value, cb) {
-      this.players[key] = function (cb) {
-        localforage.getItem(team+key, cb)
-      }
-      localforage.setItem(team+key, value, cb)
-    }
+  this.team = function () {
+    return team.slice()
   }
+  return this
+}
+Interface.prototype.getScore = function (cb) {
+  var teamKey = this.team()
+  localforage.getItem(teamKey+'score', cb)
+}
+Interface.prototype.addScore = function (score, cb) {
+
+  var teamKey = this.team()
+
+  localforage.getItem(teamKey+'score', function (err, total) {
+    if (err) throw new Error('Boo can\'t recover score')
+    if (!total) return localforage.setItem(teamKey+'score', score, cb)
+    var newScore = parseInt(total) + parseInt(score)
+    localforage.setItem(teamKey+'score', newScore, cb)
+  })
+}
+Interface.prototype.deduct = function (score, cb) {
+
+  var teamKey = this.team()
+  
+  localforage.getItem(teamKey+'score', function (err, total) {
+    if (err) throw new Error('Boo can\'t recover score')
+    var newScore = parseInt(total) - parseInt(score)
+    localforage.setItem(teamKey+'score', newScore, cb)
+  })
 }
