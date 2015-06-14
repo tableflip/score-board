@@ -1,14 +1,15 @@
 var localforage = require('localforage')
 var ScoreBoard = function (teams, cb) {
-  this.teams = teams.slice()
+  this._teams = teams
+  this.teams = this._teams.slice()
   init.call(this, teams, cb)
 }
 module.exports = ScoreBoard
 
 function init (teams, cb) {
   var self = this
-  if (teams.length == 0) {
-    return cb.call(self, null, this.teams)
+  if (teams.length === 0) {
+    return cb.call(self, null, self.teams)
   }
   var team = teams.pop()
   self[team] = new Interface(team)
@@ -41,9 +42,9 @@ function Interface (team) {
     players: {},
     addPlayer: function (key, value, cb) {
       this.players[key] = function (cb) {
-        localforage.getItem(team+key+value, cb)
+        localforage.getItem(team+key, cb)
       }
-      localforage.setItem(team+key+value, value, cb)
+      localforage.setItem(team+key, value, cb)
     }
   }
 }
