@@ -22,7 +22,7 @@ function init (teams, cb) {
 
 function Interface (team) {
   this.team = function () {
-    return team.slice()
+    return team
   }
   return this
 }
@@ -44,10 +44,17 @@ Interface.prototype.addScore = function (score, cb) {
 Interface.prototype.deduct = function (score, cb) {
 
   var teamKey = this.team()
-  
+
   localforage.getItem(teamKey+'score', function (err, total) {
     if (err) throw new Error('Boo can\'t recover score')
     var newScore = parseInt(total) - parseInt(score)
     localforage.setItem(teamKey+'score', newScore, cb)
   })
+}
+Interface.prototype.addPlayer = function (key, value, cb) {
+  var teamKey = this.team()
+  this[teamKey+key] = function (callback) {
+    return localforage.getItem(teamKey+key, callback)
+  }
+  localforage.setItem(teamKey+key, value, cb)
 }

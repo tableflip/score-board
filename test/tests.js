@@ -95,71 +95,115 @@ test('The scoreBoard holds two scores', function (t) {
     })
   })
 })
-// test('Should be able to deduct from the score', function (t) {
-//   t.plan(3)
-//   async.waterfall([
-//     function initScoreBoard (cb) {
-//       scoreBoard = new ScoreBoard(['test'], cb)
-//     },
-//     function addScore (teams, cb) {
-//       scoreBoard.test.addScore(2, cb)
-//     },
-//     function assertValue (score, cb) {
-//       t.equal(score, 2, 'score set at 2')
-//       scoreBoard.test.deduct(1, cb)
-//     },
-//     function assertNewValue (newScore, cb) {
-//       t.equal(newScore, 1, 'deduct 1 score now 1')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors deducting')
-//     t.end()
-//   })
-// })
-// test('The score increments', function (t) {
-//   t.plan(3)
-//   async.waterfall([
-//     function initScoreBoard (cb) {
-//       scoreBoard = new ScoreBoard(['test'], cb)
-//     },
-//     function addScore (teams, cb) {
-//       scoreBoard.test.addScore(1, cb)
-//     },
-//     function addAgain (score, cb) {
-//       t.equals(score, 1, 'score at 1')
-//       scoreBoard.test.addScore(1, cb)
-//     },
-//     function getScore (score, cb) {
-//       scoreBoard.test.getScore(cb)
-//     },
-//     function assertValue (score, cb) {
-//       t.equal(score, 2, 'score now 2')
-//       cb()
-//     },
-//   ], function (err) {
-//     t.ifError(err, 'no errors')
-//     t.end()
-//   })
-// })
-// test('You can add a player', function (t) {
-//   t.plan(2)
-//   async.waterfall([
-//     function initScoreBoard (cb) {
-//       scoreBoard = new ScoreBoard(['test'], cb)
-//     },
-//     function addPlayer (teams, cb) {
-//       scoreBoard.test.addPlayer('player1', 'testname', cb)
-//     },
-//     function getPlayers (player, cb) {
-//       t.ok(player, 'returns the player')
-//       cb()
-//     }
-//   ], function (err) {
-//     t.ifError(err, 'no errors')
-//     t.end()
-//   })
-// })
+test('Should be able to deduct from the score', function (t) {
+  t.plan(3)
+  localforage.clear(function (err, done){
+    async.waterfall([
+      function initScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function addScore (teams, cb) {
+        scoreBoard.test.addScore(2, cb)
+      },
+      function assertValue (score, cb) {
+        t.equal(score, 2, 'score set at 2')
+        scoreBoard.test.deduct(1, cb)
+      },
+      function assertNewValue (newScore, cb) {
+        t.equal(newScore, 1, 'deduct 1 score now 1')
+        cb()
+      }
+    ], function (err) {
+      t.ifError(err, 'no errors deducting')
+      t.end()
+    }) 
+  })
+})
+test('The score increments', function (t) {
+  t.plan(3)
+  localforage.clear(function (err, done) {
+    async.waterfall([
+      function initScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function addScore (teams, cb) {
+        scoreBoard.test.addScore(1, cb)
+      },
+      function addAgain (score, cb) {
+        t.equals(score, 1, 'score at 1')
+        scoreBoard.test.addScore(1, cb)
+      },
+      function getScore (score, cb) {
+        scoreBoard.test.getScore(cb)
+      },
+      function assertValue (score, cb) {
+        t.equal(score, 2, 'score now 2')
+        cb()
+      },
+    ], function (err) {
+      t.ifError(err, 'no errors')
+      t.end()
+    })
+  })
+})
+test('The score persists across a refresh', function (t) {
+  t.plan(3)
+  var scoreBoard
+  localforage.clear(function (err, done) {
+    async.waterfall([
+      function initScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function addScore (scoreBoard, cb) {
+        scoreBoard.test.addScore(100, cb)
+      },
+      function getScore (score, cb) {
+        scoreBoard.test.getScore(cb)
+      },
+      function assertOnScore (score, cb) {
+        t.equals(score, 100, 'score set at 100')
+        cb()
+      },
+      function setSetScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function checkScore (scoreBoard, cb) {
+        scoreBoard.test.getScore(cb)
+      },
+      function assertOnScoreAgain (score, cb) {
+        t.equal(score, 100, 'score persists')
+        cb()
+      }
+    ], function (err) {
+      t.ifError(err, 'no errors')
+      t.end()
+    })
+  })
+})
+test('You can add a player', function (t) {
+  t.plan(3)
+  localforage.clear(function (err, done) {
+    async.waterfall([
+      function initScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function addPlayer (teams, cb) {
+        scoreBoard.test.addPlayer('player1', 'testname', cb)
+      },
+      function getPlayers (player, cb) {
+        t.ok(player, 'returns the player')
+        scoreBoard.test.player1(cb)
+      },
+      function (player, cb) {
+        t.equals(player, 'testname', 'player added ok')
+        cb()
+      }
+    ], function (err) {
+      t.ifError(err, 'no errors')
+      t.end()
+    })
+  })
+})
 // test('You can retrieve players', function (t) {
 //   t.plan(2)
 //   async.waterfall([
