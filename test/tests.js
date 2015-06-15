@@ -204,6 +204,37 @@ test('You can add and get a player', function (t) {
     })
   })
 })
+test('You can "update" a player', function (t) {
+  t.plan(4)
+  localforage.clear(function (err, done) {
+    async.waterfall([
+      function initScoreBoard (cb) {
+        scoreBoard = new ScoreBoard(['test'], cb)
+      },
+      function addPlayer (teams, cb) {
+        scoreBoard.test.addPlayer('player1', 'testname', cb)
+      },
+      function getPlayer (player, cb) {
+        scoreBoard.test.player1(cb)
+      },
+      function updatePlayer (player, cb) {
+        t.equals(player, 'testname', 'player added ok')
+        scoreBoard.test.addPlayer('player1', 'updated-testname', cb)
+      },
+      function getPlayerAgain (player, cb) {
+        t.equals(player, 'updated-testname', 'player updated name returned ok')
+        scoreBoard.test.player1(cb)
+      },
+      function assert (player, cb) {
+        t.equals(player, 'updated-testname', 'update stored ok')
+        cb()
+      }
+    ], function (err) {
+      t.ifError(err, 'no errors')
+      t.end()
+    })
+  })
+})
 test('Team names must be unique', function (t) {
   t.plan(1)
   t.throws(function () {

@@ -4,12 +4,10 @@ var _ = require('underscore')
 var ScoreBoard = function (initTeams, cb) {
   if(_.uniq(initTeams).length !== initTeams.length) throw new Error('team names must be unique')
   var self = this
-  self.reset = function (cb) {localforage.reset(cb)}
+  self.reset = function (cb) {localforage.clear(cb)}
   self.teams = initTeams.slice()
   init.call(self, initTeams, cb)
 }
-
-module.exports = ScoreBoard
 
 function init (teams, cb) {
   var self = this
@@ -20,6 +18,8 @@ function init (teams, cb) {
   self[team] = new Interface(team)
   init.call(self, teams, cb)
 }
+
+module.exports = ScoreBoard
 
 function Interface (team) {
   this.team = function () {
@@ -52,10 +52,38 @@ Interface.prototype.deduct = function (score, cb) {
     localforage.setItem(teamKey+'score', newScore, cb)
   })
 }
-Interface.prototype.addPlayer = function (key, value, cb) {
+Interface.prototype.addPlayer = function (role, name, cb) {
   var teamKey = this.team()
-  this[key] = function (cb) {
-    localforage.getItem(teamKey+key, cb)
+  this[role] = function (cb) {
+    localforage.getItem(teamKey+'players', function (err, players) {
+      if (err) throw new Error(err)
+      if (!players) {
+        var players = []
+        storeNewPlayer(teamKey, players, role, name, cb)
+      }else{
+        updatePlayer(teamKey, players, role, name, cb)
+      }
+    })
   }
-  localforage.setItem(teamKey+key, value, cb)
+  cb(null, name)
+}
+
+function Player (role, name) {
+  return this[role] = name
+}
+
+function storeNewPlayer (teamKey, players, role, name, cb) {
+  players.push(new Player(role, name))
+  storePlayer(teamKey, players, role, cb)
+}
+function updatePlayer (teamKey, players, role, name, cb) {
+  var index = _.findIndex(players, function (player) { return _.keys(player)[0] == role })
+  players[index] = new Player(role, name)
+  storePlayer(teamKey, players, role, cb)
+}
+function storePlayer (teamKey, players, role, cb) {
+  localforage.setItem(teamKey+'players', players, function (err, players) {
+    var player = _.chain(players).pluck(role).first().value()
+    cb(null, player)    
+  })
 }
