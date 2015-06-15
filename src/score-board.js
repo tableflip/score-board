@@ -53,9 +53,9 @@ Interface.prototype.deduct = function (score, cb) {
   })
 }
 Interface.prototype.addPlayer = function (role, name, cb) {
-  var teamKey = this.team()
+  var teamKey = this.team() + 'players'
   this[role] = function (cb) {
-    localforage.getItem(teamKey+'players', function (err, players) {
+    localforage.getItem(teamKey, function (err, players) {
       if (err) throw new Error(err)
       if (!players) {
         var players = []
@@ -82,7 +82,7 @@ function updatePlayer (teamKey, players, role, name, cb) {
   storePlayer(teamKey, players, role, cb)
 }
 function storePlayer (teamKey, players, role, cb) {
-  localforage.setItem(teamKey+'players', players, function (err, players) {
+  localforage.setItem(teamKey, players, function (err, players) {
     var player = _.chain(players).pluck(role).first().value()
     cb(null, player)    
   })
