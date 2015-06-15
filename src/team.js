@@ -107,7 +107,7 @@ Team.prototype.deductBonus = function (bonus, cb) {
     })
   })
 }
-Team.prototype.getTotal = function (bonus, cb) {
+Team.prototype.getTotal = function (cb) {
   var self = this
   self.getScore(function (err, score) {
     if (err) return cb(err)
