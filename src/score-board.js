@@ -23,6 +23,7 @@ var ScoreBoard = function (initTeams, localforage, cb) {
 inherits(ScoreBoard, EventEmitter)
 
 ScoreBoard.prototype.getTeams = function (cb) {
+  var self = this
   this._localforage.getItem('scoreboardteams', function (err, teams) {
     if (err) return cb(err)
     cb(null, teams || [])
@@ -36,7 +37,6 @@ function init (teams, cb) {
   })
   self._localforage.setItem('scoreboardteams', teams, function (err) {
     if (err) return cb(err)
-    self.emit('ready', self)
     cb(null, self)
   })
 }
