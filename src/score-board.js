@@ -14,9 +14,6 @@ var ScoreBoard = function (initTeams, localforage, cb) {
     })
   } else {
     this.teams = initTeams.slice()
-    console.log('init ScoreBoard')
-    console.log(this.emit)
-    this.emit('team1:ready')
     localforage.clear(function () {
       init.call(self, initTeams, cb)
     })
@@ -39,6 +36,7 @@ function init (teams, cb) {
   })
   self._localforage.setItem('scoreboardteams', teams, function (err) {
     if (err) return cb(err)
+    self.emit('ready', self)
     cb(null, self)
   })
 }
