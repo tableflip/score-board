@@ -109,10 +109,9 @@ Team.prototype.deductBonus = function (bonus, cb) {
 }
 Team.prototype.getTotal = function (bonus, cb) {
   var self = this
-
-  self._localforage.getItem(self.name + 'score', function (err, score) {
+  self.getScore(function (err, score) {
     if (err) return cb(err)
-    self._localforage.getItem(self.name + 'bonus', function (err, bonus) {
+    self.getBonus(function (err, bonus) {
       if (err) return cb(err)
       cb(null, score + bonus)
     })
