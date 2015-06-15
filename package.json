@@ -1,7 +1,7 @@
 {
   "name": "score-board",
-  "version": "1.2.1",
-  "description": "two team score state",
+  "version": "1.2.2",
+  "description": "A score board for your browser. Persist state and emit events with this node module.",
   "main": "src/score-board.js",
   "scripts": {
     "test": "browserify test/tests.js > test/bundle.js && open test/tests.html"
