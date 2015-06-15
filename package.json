@@ -8,12 +8,10 @@
   },
   "author": "Bernard Mordan <bernard@tableflip.io> (http://github.com/bmordan)",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "async": "^1.2.1",
     "browserify": "^10.2.4",
-    "localforage": "^1.2.3",
-    "tape": "^4.0.0",
-    "underscore": "^1.8.3"
+    "tape": "^4.0.0"
   },
   "respository": {
     "type": "git",
