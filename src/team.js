@@ -1,11 +1,6 @@
-var Event.Emitter = require('event').EventEmitter
-var inherit = require('util').inherit
-
 function Team (team, localforage) {
   this.name = team
   this._localforage = localforage
-  this._emitEvent = function (eventName) {this.emit(eventName)}
-  this._emitEvent(team+':ready')
 }
 Team.prototype.getPlayers = function (cb) {
   this._localforage.getItem(this.name+'players', function (err, players) {
@@ -23,14 +18,13 @@ Team.prototype.getScore = function (cb) {
   })
 }
 Team.prototype.addScore = function (score, cb) {
-  var self = this
+
   this._localforage.getItem(this.name + 'score', function (err, total) {
     if (err) return cb(err)
     total = total || 0
     var newScore = total + parseInt(score)
     this._localforage.setItem(this.name + 'score', newScore, function (err, score) {
       if (err) return cb(err)
-      self._emitEvent('score:add')
     })
   }.bind(this))
 }

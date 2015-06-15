@@ -1,4 +1,6 @@
 var Team = require('./team')
+var EventEmitter = require('events').EventEmitter
+var inherits = require('util').inherits
 
 var ScoreBoard = function (initTeams, localforage, cb) {
   var self = this
@@ -12,12 +14,17 @@ var ScoreBoard = function (initTeams, localforage, cb) {
     })
   } else {
     this.teams = initTeams.slice()
-
+    console.log('init ScoreBoard')
+    console.log(this.emit)
+    this.emit('team1:ready')
     localforage.clear(function () {
       init.call(self, initTeams, cb)
     })
   }
 }
+
+inherits(ScoreBoard, EventEmitter)
+
 ScoreBoard.prototype.getTeams = function (cb) {
   this._localforage.getItem('scoreboardteams', function (err, teams) {
     if (err) return cb(err)
