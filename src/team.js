@@ -5,6 +5,7 @@ function Team (team, localforage) {
   this.name = team
   this._localforage = localforage
   this._emitEvent = function (eventName) {this.emit(eventName)}
+  this._emitEvent(team+':ready')
 }
 Team.prototype.getPlayers = function (cb) {
   this._localforage.getItem(this.name+'players', function (err, players) {
