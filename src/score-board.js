@@ -15,21 +15,22 @@ var ScoreBoard = function (initTeams, cb) {
     init.call(this, initTeams, cb)
   }
 }
-ScoreBoard.prototype.reset = function (cb) {
-  localforage.clear(cb)
-}
 ScoreBoard.prototype.getTeams = function (cb) {
-  localforage.getItem('scoreboardteams', cb)
+  localforage.getItem('scoreboardteams', function (err, teams) {
+    if (err) return cb(err)
+    cb(null, teams || [])
+  })
 }
 
 function init (teams, cb) {
   var self = this
-  if (teams.length === 0) {
-    return cb(null, self)
-  }
-  var team = teams.pop()
-  self[team] = new Team(team)
-  init.call(self, teams, cb)
+  teams.forEach(function (teamName) {
+    self[teamName] = new Team(teamName)
+  })
+  localforage.setItem('scoreboardteams', teams, function (err) {
+    if (err) return cb(err)
+    cb(null, self)
+  })
 }
 
 module.exports = ScoreBoard
@@ -38,13 +39,19 @@ function Team (team) {
   this.name = team
 }
 Team.prototype.getPlayers = function (cb) {
-  localforage.getItem(this.name+'players', cb)
+  localforage.getItem(this.name+'players', function (err, players) {
+    if (err) return cb(err)
+    cb(null, players || [])
+  })
 }
 Team.prototype.setPlayers = function (players, cb) {
   localforage.setItem(this.name+'players', players, cb)
 }
 Team.prototype.getScore = function (cb) {
-  localforage.getItem(this.name + 'score', cb)
+  localforage.getItem(this.name + 'score', function (err, score) {
+    if (err) return cb(err)
+    cb(null, score || 0)
+  })
 }
 Team.prototype.addScore = function (score, cb) {
   localforage.getItem(this.name + 'score', function (err, total) {
@@ -54,6 +61,28 @@ Team.prototype.addScore = function (score, cb) {
     localforage.setItem(this.name + 'score', newScore, cb)
   }.bind(this))
 }
+Team.prototype.getBonus = function (cb) {
+  localforage.getItem(this.name + 'bonus', function (err, bonus) {
+    if (err) return cb(err)
+    cb(null, bonus || 0)
+  })
+}
+Team.prototype.addBonus = function (bonus, cb) {
+  localforage.getItem(this.name + 'bonus', function (err, total) {
+    if (err) return cb(err)
+    total = total || 0
+    var newBonus = total + parseInt(bonus)
+    localforage.setItem(this.name + 'bonus', newBonus, cb)
+  }.bind(this))
+}
+Team.prototype.deductBonus = function (bonus, cb) {
+  localforage.getItem(this.name + 'bonus', function (err, total) {
+    if (err) return cb(err)
+    total = total || 0
+    var newBonus = total - parseInt(bonus)
+    localforage.setItem(this.name + 'bonus', newBonus, cb)
+  }.bind(this))
+}
 Team.prototype.deductScore = function (score, cb) {
   localforage.getItem(this.name + 'score', function (err, total) {
     if (err) return cb(err)
@@ -61,4 +90,14 @@ Team.prototype.deductScore = function (score, cb) {
     var newScore = total - parseInt(score)
     localforage.setItem(this.name + 'score', newScore, cb)
   }.bind(this))
+}
+Team.prototype.getTotal = function (cb) {
+  var self = this
+  this.getScore(function (err, score) {
+    if (err) return cb(err)
+    self.getBonus(function (err, bonus) {
+      if (err) return cb(err)
+      cb(null, score+bonus)
+    })
+  })
 }
