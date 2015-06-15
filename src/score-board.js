@@ -7,13 +7,13 @@ var ScoreBoard = function (initTeams, localforage, cb) {
   self._localforage = localforage
 
   if (!initTeams) {
-    this.getTeams(function (err, teams) {
+    self.getTeams(function (err, teams) {
       if (err) return cb(err)
-      if (!teams) return cb(new Error('No teams passed and no teams in storeage'))
-      init.call(self, teams, cb) 
+      if (!teams) return cb(new Error('No teams passed and no teams in storage'))
+      init.call(self, teams, cb)
     })
   } else {
-    this.teams = initTeams.slice()
+    self.teams = initTeams.slice()
     localforage.clear(function () {
       init.call(self, initTeams, cb)
     })
@@ -23,7 +23,6 @@ var ScoreBoard = function (initTeams, localforage, cb) {
 inherits(ScoreBoard, EventEmitter)
 
 ScoreBoard.prototype.getTeams = function (cb) {
-  var self = this
   this._localforage.getItem('scoreboardteams', function (err, teams) {
     if (err) return cb(err)
     cb(null, teams || [])
