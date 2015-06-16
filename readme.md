@@ -1,39 +1,97 @@
-#Score Board
+# Score Board
+This module is a generic score board for your browser.
+
 Use this module by cloning the repo
-```
+
+```sh
 git clone git@github.com:tableflip/score-board.git
 ```
+
 or
-```
+
+```sh
 npm install git://github.com/tableflip/score-board.git
 ```
+
 Don't forget to
-```
+
+```sh
 npm install
 ```
-This module is a generic score board for your browser. Initiate with team names in an array.
+
+## Usage
+
+Initiate with team names in an array:
+
 ```js
 var ScoreBoard = require('score-board')
-var scoreBoard = new ScoreBoard(['sharks', 'jets'])
+var scoreBoard = new ScoreBoard(['sharks', 'jets'], localforage, cb)
 ```
-Teams are created with a score of 0 you can increment and deduct values asynchronously which looks like this.
+
+The ScoreBoard requires a [localforage](https://github.com/mozilla/localForage) or localforage like object for persisting scores.
+
+Teams are created with a score of 0 you can increment and deduct values asynchronously which looks like this:
+
 ```js
 scoreBoard.sharks.addScore(9, cb)
 ```
+
 This will add 9 points to the shark's score. When it's done your callback function will be executed. Callback functions follow the node callback signiture below. You don't have to pass a callback in if you don't want to.
+
 ```js
 function (err, result) {
-  if (err) throw new Error(err)
-  doStuffWithResult(here)
+  if (err) throw err
+  doStuffWithResult(result)
 }
 ```
-Here is v1.2.0 interface
+
+### Restoring teams and scores
+
+If you create a `ScoreBoard` passing `null` for team names, it'll attempt to reinstate existing teams from storage:
+
 ```js
-scoreBoard.sharks.addScore(9, cb) // returns 9 as the second argument of a callback 
-scoreBoard.sharks.getScore(cb) // returns 9 as the second argument of a callback
-scoreBoard.sharks.deduct(3, cb) // returns 6 as the second argument of a callback
-scoreBoard.sharks.addPlayer('player1','Bernard', cb) // adds 'Bernard' as player1
-scoreBoard.sharks.player1(cb) // returns 'Bernard' the name of player1
+var ScoreBoard = require('score-board')
+
+new ScoreBoard(null, localforage, function (err, scoreBoard) {
+  if (err) return console.error('No teams in storage')
+  scoreBoard.getTeams(function (err, teams) {
+    console.log(teams)
+  })
+})
 ```
+
+## API
+
+```js
+scoreBoard.getTeams(cb) // callback with ['sharks', 'jets']
+
+// Main score
+scoreBoard.sharks.addScore(9, cb) // callback with 9
+scoreBoard.sharks.getScore(cb) // callback with 9
+scoreBoard.sharks.setScore(10, cb) // callback with 10
+scoreBoard.sharks.deductScore(3, cb) // callback with 7
+
+// Bonus points
+scoreBoard.sharks.addBonus(9, cb) // callback with 9
+scoreBoard.sharks.getBonus(cb) // callback with 9
+scoreBoard.sharks.setBonus(10, cb) // callback with 10
+scoreBoard.sharks.deductBonus(3, cb) // callback with 7
+
+// Total (score + bonus)
+scoreBoard.sharks.getTotal(cb) // callback with 14
+```
+
+## Events
+
+### Team
+
+Team objects emit the following events:
+
+* score:add
+* score:deduct
+* score:set
+* bonus:add
+* bonus:deduct
+* bonus:set
+
 Uses tape in the browser for tests. To run the tests type `npm test` in the root of the project.
-![tape tests](https://s3-eu-west-1.amazonaws.com/bmordantagbang/Screen+Shot+2015-06-13+at+15.40.31.jpg?X-Amz-Date=20150613T144302Z&X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=8924f929a4b6294d0aed0a63b59ea0d1adac82e1cdd459b99037629f57e2e04b&X-Amz-Credential=ASIAJUV42PIJ426NK73Q/20150613/eu-west-1/s3/aws4_request&X-Amz-SignedHeaders=Host&x-amz-security-token=AQoDYXdzEMD//////////wEagAJlFaG9XdBOXIZAdTMUGC2oXoznVbxLWhPrZYGIxV%2Bu7Bvj4M/HDWN0h1vTWdm%2BLJpsWm8gV4JhAJgfdUNbFtsrN48B9OS4Ua4CkFqer2IeY9PL2FaxaXP/JB3A/dyvNXPV5oTK8qGBgJCYgB38hqP4OLlI5jYjywBFKmlIrxumM6TElBtcheFUUvAOICWP0FMsFiTqMNG1auV2H5kVz6op55qn0%2BMEOGg1IDugPVMkGJnrDsrRLT%2BrmGpasBzqr76GaEV25giV3RicHr9psmkaJb/6IRNLmUW84KxAgnnsH0lkvVIK8FreaSNJrvYyZdV2g22tsj5KAQoYQuGJ4/IkIJKC8asF)
