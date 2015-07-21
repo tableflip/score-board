@@ -73,7 +73,7 @@ Team.prototype.getBonus = function (cb) {
 Team.prototype.setBonus = function (bonus, cb) {
   var self = this
 
-  self._localforage.setItem(self.name + 'score', bonus, function (err) {
+  self._localforage.setItem(self.name + 'bonus', bonus, function (err) {
     if (err) return cb(err)
     self.emit('bonus:set', bonus)
     cb(null, bonus)
