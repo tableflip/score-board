@@ -1,6 +1,6 @@
 {
   "name": "score-board",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "A score board for your browser. Persist state and emit events with this node module.",
   "main": "src/score-board.js",
   "scripts": {
