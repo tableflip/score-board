@@ -95,3 +95,7 @@ Team objects emit the following events:
 * bonus:set
 
 Uses tape in the browser for tests. To run the tests type `npm test` in the root of the project.
+
+---
+
+A [(╯°□°）╯︵TABLEFLIP](https://tableflip.io) side project.
